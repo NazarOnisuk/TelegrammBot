@@ -6,7 +6,7 @@ from telegram import ReplyKeyboardRemove
 from random import randint
 from bs4 import BeautifulSoup
 import requests
-from time import time
+
 # Запускаем логгирование
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -14,11 +14,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-TOKEN = '5254458387:AAFfnyfRL_mmV4Xyy05XqlLqa8rKtSy5rmc'
+TOKEN = 'TOKEN'
 
-
-def echo(update, context):
-    update.message.reply_text(update.message.text)
 
 def parseFilmByGenre(genres, rating=0):
     title = []
@@ -32,9 +29,23 @@ def parseFilmByGenre(genres, rating=0):
         soup = BeautifulSoup(page.text, "html.parser")
         titles = soup.findAll('div', class_='nbl-slimPosterBlock__title')
         titles = list(map(lambda x: x.text.strip(), titles))
-        print(titles[:10])
-        
-        
+        spisok_tops = titles[:10]
+        spisok_tops1 = []
+        for i in spisok_tops:
+            stroka_tops = i.encode("utf-8")
+            spisok_tops1.append(stroka_tops.decode("utf-8"))
+        return spisok_tops1
+
+
+def parseFilmFind(name):
+    if ' ' in name:
+        names = name.split(' ')
+        url = f'https://www.ivi.ru/movies/{"_".join(names)}?ivi_search={"%20".join(names)}'
+    else:
+        url = f'https://www.ivi.ru/movies/{name}?ivi_search={name}'
+    return url
+
+
 def start(update, context):
     reply_keyboard = [['Помощь'],
                       ['Показать погоду'],
@@ -58,45 +69,49 @@ def start(update, context):
 
 
 def help(update, context):
-    update.message.reply_text(
-        "Я пока не умею помогать... Я только ваше эхо.")
+    with open("help.txt", encoding="utf-8") as file:
+        update.message.reply_text(file.read())
+
+
+def sreach_weather(update, context):
+    update.message.reply_text("В разработке")
 
 
 def search_film(update, context):
-    update.message.reply_text("Введите 'Найти: (название фильма)'")
+    update.message.reply_text("Введите 'Найди (название фильма)'")
 
 
 def tops(update, context):
-    reply_keyboard = [['Приключения'],
+    reply_keyboard = [['Артхаус'],
                       ['Биография'],
                       ['Боевики'],
-                      ['Комедия'],
-                      ['Comics'],
-                      ['Crime'],
-                      ['Детективный'],
-                      ['Детскийе'],
-                      ['Disaster'],
-                      ['Для всей семьи'],
+                      ['Вестерн'],
+                      ['Военные'],
+                      ['Детективы'],
+                      ['Для детей'],
                       ['Документальные'],
-                      ['Драма'],
-                      ['Фантастика'],
-                      ['Фентези'],
-                      ['Иностранное'],
-                      ['Ужасы'],
-                      ['Историческое'],
-                      ['Мелодрама'],
-                      ['Российские'],
-                      ['Советское кино'],
+                      ['Драмы'],
+                      ['Зарубежные'],
+                      ['Исторические'],
+                      ['Катастрофы'],
+                      ['Комедии'],
+                      ['Криминал'],
+                      ['Мелодрамы'],
+                      ['Мистические'],
+                      ['По комиксам'],
+                      ['Приключения'],
+                      ['Русские'],
+                      ['Семейные'],
+                      ['Советские'],
                       ['Спорт'],
                       ['Триллеры'],
-                      ['Военные'],
-                      ['Western'],
-                      ['Arthouse'],
-                      ['Мистическое'],
+                      ['Ужасы'],
+                      ['Фантастика'],
+                      ['Фентези'],
                       ['Вернуться назад']]
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
     update.message.reply_text(
-        "Текст",
+        "Выберите жанр",
         reply_markup=markup)
 
 
@@ -178,76 +193,176 @@ def text_handler_f(update, context):
 
     if "Показать погоду":
         pass
-        #Надо узнать местоположение пользователя
 
     if "Найти фильм" == text:
-        #это не работает
-        # while True:
-        #     film = update.message.text
-        #     print(film)
-        #     if film != "Найти фильм":
-        #         break
-        # update.message.reply_text(f"Ищу фильм {film}")
         search_film(update, context)
-    if "Найти:" in text:
+    if "Найди" in text or 'найди' in text or 'yfqlb' in text or 'Yfqlb' in text:
         poisk = update.message.text
-        update.message.reply_text(f"Ищу фильм {poisk[7:]}")
+        update.message.reply_text(f"Ищу фильм {poisk[6:]}")
+        update.message.reply_text(f'Вот что я нашел: {parseFilmFind(poisk[6:])}')
 
     if "Топы фильмов" == text:
         tops(update, context)
-    if "Приключения" == text:
-        pass
+    if "Артхаус" == text:
+        count = 1
+        for i in parseFilmByGenre('arthouse', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
     if "Биография" == text:
-        pass
+        # update.message.reply_text(parseFilmByGenre('biography', rating=0))
+        count = 1
+        for i in parseFilmByGenre('biography', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
     if "Боевики" == text:
-        pass
-    if "Комедия" == text:
-        pass
-    if "Comics" == text:
-        pass
-    if "Crime" == text:
-        pass
-    if "Детективный" == text:
-        pass
-    if "Детскийе" == text:
-        pass
-    if "Для всей семьи" == text:
-        pass
-    if "Документальные" == text:
-        pass
-    if "Фантастика" == text:
-        pass
-    if "Фентези" == text:
-        pass
-    if "Иностранное" == text:
-        pass
-    if "Ужасы" == text:
-        pass
-    if "Историческое" == text:
-        pass
-    if "Мелодрама" == text:
-        pass
-    if "Российские" == text:
-        pass
-    if "Советское кино" == text:
-        pass
-    if "Спорт" == text:
-        pass
-    if "Триллеры" == text:
-        pass
+        # update.message.reply_text(parseFilmByGenre('boeviki', rating=0))
+        count = 1
+        for i in parseFilmByGenre('boeviki', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Вестерн" == text:
+        # update.message.reply_text(parseFilmByGenre('western', rating=0))
+        count = 1
+        for i in parseFilmByGenre('western', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
     if "Военные" == text:
-        pass
-    if "Western" == text:
-        pass
-    if "Arthouse" == text:
-        pass
-    if "Мистическое" == text:
-        pass
+        # update.message.reply_text(parseFilmByGenre('voennye', rating=0))
+        count = 1
+        for i in parseFilmByGenre('voennye', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Детективы" == text:
+        # update.message.reply_text(parseFilmByGenre('detective', rating=0))
+        count = 1
+        for i in parseFilmByGenre('detective', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Для детей" == text:
+        # update.message.reply_text(parseFilmByGenre('detskiy', rating=0))
+        count = 1
+        for i in parseFilmByGenre('detskiy', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Документальные" == text:
+        # update.message.reply_text(parseFilmByGenre('documentary', rating=0))
+        count = 1
+        for i in parseFilmByGenre('documentary', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Драмы" == text:
+        # update.message.reply_text(parseFilmByGenre('drama', rating=0))
+        count = 1
+        for i in parseFilmByGenre('drama', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Зарубежные" == text:
+        # update.message.reply_text(parseFilmByGenre('foreign', rating=0))
+        count = 1
+        for i in parseFilmByGenre('foreign', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Исторические" == text:
+        # update.message.reply_text(parseFilmByGenre('istoricheskie', rating=0))
+        count = 1
+        for i in parseFilmByGenre('istoricheskie', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Катастрофы" == text:
+        # update.message.reply_text(parseFilmByGenre('disaster', rating=0))
+        count = 1
+        for i in parseFilmByGenre('disaster', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Комедии" == text:
+        # update.message.reply_text(parseFilmByGenre('comedy', rating=0))
+        count = 1
+        for i in parseFilmByGenre('comedy', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Криминал" == text:
+        # update.message.reply_text(parseFilmByGenre('crime', rating=0))
+        count = 1
+        for i in parseFilmByGenre('crime', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Мелодрамы" == text:
+        # update.message.reply_text(parseFilmByGenre('melodramy', rating=0))
+        count = 1
+        for i in parseFilmByGenre('melodramy', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Мистические" == text:
+        # update.message.reply_text(parseFilmByGenre('misticheskie', rating=0))
+        count = 1
+        for i in parseFilmByGenre('misticheskie', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "По комиксам" == text:
+        # update.message.reply_text(parseFilmByGenre('comics', rating=0))
+        count = 1
+        for i in parseFilmByGenre('comics', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Приключения" == text:
+        # update.message.reply_text(parseFilmByGenre('adventures', rating=0))
+        count = 1
+        for i in parseFilmByGenre('adventures', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Русские" == text:
+        # update.message.reply_text(parseFilmByGenre('rossijskie', rating=0))
+        count = 1
+        for i in parseFilmByGenre('rossijskie', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Семейные" == text:
+        # update.message.reply_text(parseFilmByGenre('dlya_vsej_semi', rating=0))
+        count = 1
+        for i in parseFilmByGenre('dlya_vsej_semi', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Советские" == text:
+        # update.message.reply_text(parseFilmByGenre('sovetskoe_kino', rating=0))
+        count = 1
+        for i in parseFilmByGenre('sovetskoe_kino', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Спорт" == text:
+        # update.message.reply_text(parseFilmByGenre('sport', rating=0))
+        count = 1
+        for i in parseFilmByGenre('sport', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Триллеры" == text:
+        # update.message.reply_text(parseFilmByGenre('thriller', rating=0))
+        count = 1
+        for i in parseFilmByGenre('thriller', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Ужасы" == text:
+        # update.message.reply_text(parseFilmByGenre('horror', rating=0))
+        count = 1
+        for i in parseFilmByGenre('horror', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Фантастика" == text:
+        # update.message.reply_text(parseFilmByGenre('fantastika', rating=0))
+        count = 1
+        for i in parseFilmByGenre('fantastika', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
+    if "Фентези" == text:
+        # update.message.reply_text(parseFilmByGenre('fentezi', rating=0))
+        count = 1
+        for i in parseFilmByGenre('fentezi', rating=0):
+            update.message.reply_text(f'{count}) {i}')
+            count += 1
 
     if "Бросить кубик" == text:
         dice(update, context)
     if "Кинуть один шестигранный кубик" == text:
-        #dice(update, context)
+        # dice(update, context)
         update.message.reply_text(f"Шестигранный кубик показывает: {str(randint(1, 6))}")
         reply_keyboard = [['Кинуть один шестигранный кубик опять'],
                           ['Кинуть 2 шестигранных кубика одновременно'],
@@ -259,7 +374,7 @@ def text_handler_f(update, context):
             reply_markup=markup)
     if "Кинуть 2 шестигранных кубика одновременно" == text:
         update.message.reply_text(f"Шестигранные кубики показывают: {str(randint(1, 6))}, {str(randint(1, 6))}")
-        #dice(update, context)
+        # dice(update, context)
         reply_keyboard = [['Кинуть один шестигранный кубик'],
                           ['Снова кинуть 2 шестигранных кубика одновременно'],
                           ['Кинуть 20-гранный кубик'],
@@ -270,7 +385,7 @@ def text_handler_f(update, context):
             reply_markup=markup)
     if "Кинуть 20-гранный кубик" == text:
         update.message.reply_text(f"Двадцатигранный кубик показывает: {str(randint(1, 20))}")
-        #dice(update, context)
+        # dice(update, context)
         reply_keyboard = [['Кинуть один шестигранный кубик'],
                           ['Кинуть 2 шестигранных кубика одновременно'],
                           ['Опять кинуть 20-гранный кубик'],
