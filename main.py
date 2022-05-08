@@ -4,6 +4,9 @@ from telegram.ext import CommandHandler
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 from random import randint
+from bs4 import BeautifulSoup
+import requests
+from time import time
 # Запускаем логгирование
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -17,7 +20,21 @@ TOKEN = '5254458387:AAFfnyfRL_mmV4Xyy05XqlLqa8rKtSy5rmc'
 def echo(update, context):
     update.message.reply_text(update.message.text)
 
+def parseFilmByGenre(genres, rating=0):
+    title = []
+    if rating:
+        url = f'https://www.ivi.ru/movies/{genres}?ivi_rating_10_gte={rating}'
+    else:
+        url = f'https://www.ivi.ru/movies/{genres}'
 
+    page = requests.get(url)
+    if page.status_code == 200:
+        soup = BeautifulSoup(page.text, "html.parser")
+        titles = soup.findAll('div', class_='nbl-slimPosterBlock__title')
+        titles = list(map(lambda x: x.text.strip(), titles))
+        print(titles[:10])
+        
+        
 def start(update, context):
     reply_keyboard = [['Помощь'],
                       ['Показать погоду'],
