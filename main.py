@@ -4,7 +4,6 @@ from telegram.ext import CommandHandler
 from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 from random import randint
-
 # Запускаем логгирование
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -12,7 +11,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-TOKEN = '5216319050:AAFusnCu9crditwtu2JMjbzqJfqwPEhspSI'
+TOKEN = '5254458387:AAFfnyfRL_mmV4Xyy05XqlLqa8rKtSy5rmc'
 
 
 def echo(update, context):
@@ -21,6 +20,7 @@ def echo(update, context):
 
 def start(update, context):
     reply_keyboard = [['Помощь'],
+                      ['Показать погоду'],
                       ['Найти фильм'],
                       ['Топы фильмов'],
                       ['Бросить кубик'],
@@ -41,15 +41,46 @@ def start(update, context):
 
 
 def help(update, context):
-    fp = open("help", encoding="utf-8")
-    sp = fp.read()
     update.message.reply_text(
-        f"{sp}")
-    fp.close()
+        "Я пока не умею помогать... Я только ваше эхо.")
 
 
 def search_film(update, context):
     update.message.reply_text("Введите 'Найти: (название фильма)'")
+
+
+def tops(update, context):
+    reply_keyboard = [['Приключения'],
+                      ['Биография'],
+                      ['Боевики'],
+                      ['Комедия'],
+                      ['Comics'],
+                      ['Crime'],
+                      ['Детективный'],
+                      ['Детскийе'],
+                      ['Disaster'],
+                      ['Для всей семьи'],
+                      ['Документальные'],
+                      ['Драма'],
+                      ['Фантастика'],
+                      ['Фентези'],
+                      ['Иностранное'],
+                      ['Ужасы'],
+                      ['Историческое'],
+                      ['Мелодрама'],
+                      ['Российские'],
+                      ['Советское кино'],
+                      ['Спорт'],
+                      ['Триллеры'],
+                      ['Военные'],
+                      ['Western'],
+                      ['Arthouse'],
+                      ['Мистическое'],
+                      ['Вернуться назад']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    update.message.reply_text(
+        "Текст",
+        reply_markup=markup)
 
 
 def dice(update, context):
@@ -128,26 +159,109 @@ def text_handler_f(update, context):
     if "Помощь" == text:
         help(update, context)
 
+    if "Показать погоду":
+        pass
+        #Надо узнать местоположение пользователя
+
     if "Найти фильм" == text:
+        #это не работает
+        # while True:
+        #     film = update.message.text
+        #     print(film)
+        #     if film != "Найти фильм":
+        #         break
+        # update.message.reply_text(f"Ищу фильм {film}")
         search_film(update, context)
     if "Найти:" in text:
         poisk = update.message.text
         update.message.reply_text(f"Ищу фильм {poisk[7:]}")
 
     if "Топы фильмов" == text:
+        tops(update, context)
+    if "Приключения" == text:
+        pass
+    if "Биография" == text:
+        pass
+    if "Боевики" == text:
+        pass
+    if "Комедия" == text:
+        pass
+    if "Comics" == text:
+        pass
+    if "Crime" == text:
+        pass
+    if "Детективный" == text:
+        pass
+    if "Детскийе" == text:
+        pass
+    if "Для всей семьи" == text:
+        pass
+    if "Документальные" == text:
+        pass
+    if "Фантастика" == text:
+        pass
+    if "Фентези" == text:
+        pass
+    if "Иностранное" == text:
+        pass
+    if "Ужасы" == text:
+        pass
+    if "Историческое" == text:
+        pass
+    if "Мелодрама" == text:
+        pass
+    if "Российские" == text:
+        pass
+    if "Советское кино" == text:
+        pass
+    if "Спорт" == text:
+        pass
+    if "Триллеры" == text:
+        pass
+    if "Военные" == text:
+        pass
+    if "Western" == text:
+        pass
+    if "Arthouse" == text:
+        pass
+    if "Мистическое" == text:
         pass
 
     if "Бросить кубик" == text:
         dice(update, context)
     if "Кинуть один шестигранный кубик" == text:
+        #dice(update, context)
         update.message.reply_text(f"Шестигранный кубик показывает: {str(randint(1, 6))}")
-        dice(update, context)
+        reply_keyboard = [['Кинуть один шестигранный кубик опять'],
+                          ['Кинуть 2 шестигранных кубика одновременно'],
+                          ['Кинуть 20-гранный кубик'],
+                          ['Вернуться назад']]
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        update.message.reply_text(
+            "Бросим кубик",
+            reply_markup=markup)
     if "Кинуть 2 шестигранных кубика одновременно" == text:
         update.message.reply_text(f"Шестигранные кубики показывают: {str(randint(1, 6))}, {str(randint(1, 6))}")
-        dice(update, context)
+        #dice(update, context)
+        reply_keyboard = [['Кинуть один шестигранный кубик'],
+                          ['Снова кинуть 2 шестигранных кубика одновременно'],
+                          ['Кинуть 20-гранный кубик'],
+                          ['Вернуться назад']]
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        update.message.reply_text(
+            "Бросим кубик",
+            reply_markup=markup)
     if "Кинуть 20-гранный кубик" == text:
         update.message.reply_text(f"Двадцатигранный кубик показывает: {str(randint(1, 20))}")
-        dice(update, context)
+        #dice(update, context)
+        reply_keyboard = [['Кинуть один шестигранный кубик'],
+                          ['Кинуть 2 шестигранных кубика одновременно'],
+                          ['Опять кинуть 20-гранный кубик'],
+                          ['Вернуться назад']]
+        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        update.message.reply_text(
+            "Бросим кубик",
+            reply_markup=markup)
 
     if "Поставить таймер" == text:
         timer(update, context)
